@@ -2,6 +2,7 @@ import os
 import shutil
 import zipfile
 import rarfile
+import mimetypes
 from datetime import datetime
 from pyrogram import Client, filters
 from UnzipBot.functions import absolute_paths, progress
@@ -15,7 +16,6 @@ ERROR_TOPIC_ID = 18
 FILES_TOPIC_ID = 20
 
 tortoise_filter = filters.create(lambda _, __, query: query.data.lower() == "tortoise")
-
 
 
 @Client.on_callback_query(tortoise_filter)
@@ -64,9 +64,14 @@ async def _tortoise(unzipbot, callback_query):
         extracted_files = [i async for i in absolute_paths(extract_dir)]
         
         for file_path in extracted_files:
+            mime_type, _ = mimetypes.guess_type(file_path)
             try:
-                # Send the file back to the user who triggered the bot
-                sent_message = await unzipbot.send_document(callback_query.from_user.id, file_path)
+                if mime_type and mime_type.startswith('video'):
+                    sent_message = await unzipbot.send_video(callback_query.from_user.id, file_path)
+                elif mime_type and mime_type.startswith('image'):
+                    sent_message = await unzipbot.send_photo(callback_query.from_user.id, file_path)
+                else:
+                    sent_message = await unzipbot.send_document(callback_query.from_user.id, file_path)
                 
                 # Forward the sent message to the group topic
                 await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.id)
