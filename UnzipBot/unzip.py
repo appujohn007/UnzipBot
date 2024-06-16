@@ -24,5 +24,5 @@ async def unzip_files(unzipbot, msg):
             from_chat_id=msg.chat.id,
             message_id=msg.id
         )
-        await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, msg.id)
+        await unzipbot.forward_messages(GROUP_CHAT_ID, callback_query.from_user.id, msg.id)
           
