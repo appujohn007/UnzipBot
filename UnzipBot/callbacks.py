@@ -15,7 +15,7 @@ async def _home(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
     message_id = callback_query.message.id
     user = await unzipbot.get_me()
-    mention = user["mention"]
+    mention = user.mention
     await unzipbot.edit_message_text(
         chat_id=chat_id,
         message_id=message_id,
