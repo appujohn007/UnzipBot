@@ -3,10 +3,14 @@ import shutil
 import zipfile
 import rarfile
 import mimetypes
+import time
 from datetime import datetime
-from pyrogram import Client, filters
-from UnzipBot.functions import absolute_paths, progress
+from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait
+from moviepy.editor import VideoFileClip
+
+# Manually add .3gp file extension to video MIME types
+mimetypes.add_type('video/3gpp', '.3gp')
 
 # Telegram group topic ID where messages will be forwarded
 GROUP_TOPIC_CHAT_ID = -1002107123962
@@ -16,7 +20,6 @@ ERROR_TOPIC_ID = 18
 FILES_TOPIC_ID = 20
 
 tortoise_filter = filters.create(lambda _, __, query: query.data.lower() == "tortoise")
-
 
 @Client.on_callback_query(tortoise_filter)
 async def _tortoise(unzipbot, callback_query):
@@ -67,30 +70,53 @@ async def _tortoise(unzipbot, callback_query):
             mime_type, _ = mimetypes.guess_type(file_path)
             try:
                 if mime_type and mime_type.startswith('video'):
-                    sent_message = await unzipbot.send_video(callback_query.from_user.id, file_path)
+                    # Use moviepy to get video duration and thumbnail
+                    video = VideoFileClip(file_path)
+                    duration = video.duration
+                    thumbnail_path = f"{file_path}_thumbnail.jpg"
+                    video.save_frame(thumbnail_path, t=duration / 2)  # Save thumbnail at half duration
+                    video.close()
+                    
+                    # Send video with thumbnail
+                    sent_message = await unzipbot.send_video(
+                        callback_query.from_user.id,
+                        file_path,
+                        thumb=thumbnail_path,
+                        duration=int(duration)
+                    )
+                    
+                    # Forward the sent message to the group topic
+                    await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.message_id)
+                    
+                    # Remove temporary thumbnail file
+                    os.remove(thumbnail_path)
                 elif mime_type and mime_type.startswith('image'):
                     sent_message = await unzipbot.send_photo(callback_query.from_user.id, file_path)
                 else:
                     sent_message = await unzipbot.send_document(callback_query.from_user.id, file_path)
                 
                 # Forward the sent message to the group topic
-                await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.id)
+                await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.message_id)
             except FloodWait as e:
                 print(f"FloodWait error: sleeping for {e.x} seconds")
                 time.sleep(e.x)
 
         stop = datetime.now()
         await msg.reply(
-            f"Extraction Done Successfully..! \n\nTook {round((stop - start).total_seconds() / 60, 2)} minutes \n\nFor more bots visit @MysteryBots")
+            f"**Extraction Done Successfully..! \n\nTook {round((stop - start).total_seconds() / 60, 2)} minutes\n\nMade With ❤️ By @botio_devs**", parse_mode=enums.ParseMode.MARKDOWN)
     except rarfile.RarCannotExec:
         error_message = "**ERROR :** This File is possibly bugged. Cannot extract content. \n\n" \
                         "This may happen when a file's extension is manually changed to `.zip`/`.rar` even when file isn't in that format. \n\n" \
                         "Try with some other file please."
-        await unzipbot.send_message(callback_query.from_user.id, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+        await unzipbot.send_message(callback_query.from_user.id, error_message)
+        await unzipbot.send_message(GROUP_TOPIC_CHAT_ID, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+         
     except Exception as e:
-        error_message = f"**ERROR : **{str(e)}\n\nForward this message to @MysteryBots to solve this problem."
+        error_message = f"**ERROR : **{str(e)}\n\n Send a message to botio_devs_discuss to resolve and report the issue."
         print(f"Unexpected error: {e}")  # Debug: Print unexpected errors
-        await unzipbot.send_message(callback_query.from_user.id, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+        await unzipbot.send_message(callback_query.from_user.id, error_message)
+        await unzipbot.send_message(GROUP_TOPIC_CHAT_ID, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+        
     finally:
         if os.path.isdir("downloads"):
             shutil.rmtree("downloads")
