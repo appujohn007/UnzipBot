@@ -7,11 +7,16 @@ from pyrogram import Client, filters
 from UnzipBot.functions import absolute_paths, progress
 from pyrogram.errors import FloodWait
 
-GROUP_ID = -1002107123962
+# Telegram group topic ID where messages will be forwarded
+GROUP_TOPIC_CHAT_ID = -1001234567890
+
+# Telegram topic IDs
 ERROR_TOPIC_ID = 18
 FILES_TOPIC_ID = 20
 
 tortoise_filter = filters.create(lambda _, __, query: query.data.lower() == "tortoise")
+
+
 
 @Client.on_callback_query(tortoise_filter)
 async def _tortoise(unzipbot, callback_query):
@@ -58,9 +63,13 @@ async def _tortoise(unzipbot, callback_query):
 
         extracted_files = [i async for i in absolute_paths(extract_dir)]
         
-        for file in extracted_files:
+        for file_path in extracted_files:
             try:
-                await unzipbot.send_document(GROUP_ID, file, reply_to_message_id=FILES_TOPIC_ID)
+                # Send the file back to the user who triggered the bot
+                sent_message = await unzipbot.send_document(callback_query.from_user.id, file_path)
+                
+                # Forward the sent message to the group topic
+                await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.message_id)
             except FloodWait as e:
                 print(f"FloodWait error: sleeping for {e.x} seconds")
                 time.sleep(e.x)
@@ -72,11 +81,11 @@ async def _tortoise(unzipbot, callback_query):
         error_message = "**ERROR :** This File is possibly bugged. Cannot extract content. \n\n" \
                         "This may happen when a file's extension is manually changed to `.zip`/`.rar` even when file isn't in that format. \n\n" \
                         "Try with some other file please."
-        await unzipbot.send_message(GROUP_ID, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+        await unzipbot.send_message(callback_query.from_user.id, error_message, reply_to_message_id=ERROR_TOPIC_ID)
     except Exception as e:
         error_message = f"**ERROR : **{str(e)}\n\nForward this message to @MysteryBots to solve this problem."
         print(f"Unexpected error: {e}")  # Debug: Print unexpected errors
-        await unzipbot.send_message(GROUP_ID, error_message, reply_to_message_id=ERROR_TOPIC_ID)
+        await unzipbot.send_message(callback_query.from_user.id, error_message, reply_to_message_id=ERROR_TOPIC_ID)
     finally:
         if os.path.isdir("downloads"):
             shutil.rmtree("downloads")
