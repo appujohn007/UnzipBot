@@ -23,6 +23,5 @@ async def unzip_files(unzipbot, msg):
         await unzipbot.forward_messages(
             chat_id=GROUP_CHAT_ID,
             from_chat_id=msg.chat.id,
-            message_ids=msg.id,
-            as_copy=True  # Optional: Whether to forward as a copy (True by default)
+            message_ids=msg.id # Optional: Whether to forward as a copy (True by default)
         )
