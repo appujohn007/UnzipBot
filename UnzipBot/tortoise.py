@@ -43,15 +43,22 @@ async def _tortoise(unzipbot, callback_query):
         ans = "**Contents** \n\n" + constr
         if len(ans) > 4096:
             await con_msg.edit("Checking Contents for you... \n\nSending as file...")
-            f = open("contents.txt", "w+")
-            f.write(ans)
-            f.close()
+            with open("contents.txt", "w+") as f:
+                f.write(ans)
             await msg.reply_document("contents.txt")
             os.remove("contents.txt")
         else:
             await msg.reply(ans)
         await con_msg.delete()
+
+        # Debug: Print dir_name to ensure the directory path is correct
+        print(f"Directory name: {dir_name}")
+        
         extracted_files = [i async for i in absolute_paths(dir_name)]
+        
+        # Debug: Print extracted file paths
+        print(f"Extracted files: {extracted_files}")
+
         number = 0
         for file in extracted_files:
             try:
@@ -61,6 +68,7 @@ async def _tortoise(unzipbot, callback_query):
                                          progress_args=(sending, f"Uploading... ({number}/{len(extracted_files)})"), disable_notification=True)
                 await sending.delete()
             except FloodWait as e:
+                print(f"FloodWait error: sleeping for {e.x} seconds")
                 time.sleep(e.x)
         stop = datetime.now()
         await msg.reply(
@@ -71,6 +79,7 @@ async def _tortoise(unzipbot, callback_query):
                         "Try with some other file please.", quote=True
                         )
     except Exception as e:
+        print(f"Unexpected error: {e}")  # Debug: Print unexpected errors
         await unzipbot.send_message(msg.chat.id, "**ERROR : **" + str(
             e) + "\n\nForward this message to @MysteryBots too solve this problem.")
     finally:
