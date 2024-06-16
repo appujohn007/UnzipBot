@@ -15,7 +15,7 @@ help_filter = filters.create(lambda _, __, query: query.data.lower() == "help")
 @Client.on_callback_query(home_filter)
 async def _home(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
-    message_id = callback_query.message.message_id
+    message_id = callback_query.message.id
     user = await unzipbot.get_me()
     mention = user["mention"]
     await unzipbot.edit_message_text(
@@ -29,7 +29,7 @@ async def _home(unzipbot, callback_query):
 @Client.on_callback_query(about_filter)
 async def _about(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
-    message_id = callback_query.message.message_id
+    message_id = callback_query.message.id
     await unzipbot.edit_message_text(
         chat_id=chat_id,
         message_id=message_id,
@@ -42,7 +42,7 @@ async def _about(unzipbot, callback_query):
 @Client.on_callback_query(deploy_filter)
 async def _deploy(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
-    message_id = callback_query.message.message_id
+    message_id = callback_query.message.id
     await unzipbot.edit_message_text(
         chat_id=chat_id,
         message_id=message_id,
@@ -55,7 +55,7 @@ async def _deploy(unzipbot, callback_query):
 @Client.on_callback_query(help_filter)
 async def _help(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
-    message_id = callback_query.message.message_id
+    message_id = callback_query.message.id
     await unzipbot.edit_message_text(
         chat_id=chat_id,
         message_id=message_id,
@@ -67,18 +67,18 @@ async def _help(unzipbot, callback_query):
 @Client.on_callback_query(modes_filter)
 async def _modes(unzipbot, callback_query):
     chat_id = callback_query.from_user.id
-    message_id = callback_query.message.message_id
+    message_id = callback_query.message.id
     if callback_query.message.reply_to_message and callback_query.message.reply_to_message.document:
         await unzipbot.edit_message_text(
             chat_id=chat_id,
-            message_id=message_id,
+            message_id=id,
             text=Data.MODES,
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📤 Return to Modes 📤", callback_data="mode_return")]])
         )
     else:
         await unzipbot.edit_message_text(
             chat_id=chat_id,
-            message_id=message_id,
+            message_id=id,
             text=Data.MODES,
             reply_markup=InlineKeyboardMarkup(Data.home_button)
         )
@@ -90,7 +90,7 @@ async def _mode_return(unzipbot, callback_query):
     message_id = callback_query.message.message_id
     await unzipbot.edit_message_text(
         chat_id=chat_id,
-        message_id=message_id,
+        message_id=id,
         text=Data.CHOOSE_MODE,
         reply_markup=InlineKeyboardMarkup(Data.modes_buttons),
     )
