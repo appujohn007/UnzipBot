@@ -25,21 +25,30 @@ async def _tortoise(unzipbot, callback_query):
         main = await msg.reply("Downloading...", quote=True)
         file = await msg.download(progress=progress, progress_args=(main, "Downloading..."))
         await main.edit("Extracting Files...")
+        extract_dir = os.path.join("downloads", os.path.splitext(file_name)[0])
+        os.makedirs(extract_dir, exist_ok=True)
         if file_name.endswith(".zip"):
             with zipfile.ZipFile(file, 'r') as zip_ref:
                 contents = zip_ref.namelist()
-                zip_ref.extractall("downloads")
-            dir_name = file.replace(".zip", "")
-        if file_name.endswith(".rar"):
+                zip_ref.extractall(extract_dir)
+        elif file_name.endswith(".rar"):
             with rarfile.RarFile(file, 'r') as rar_ref:
                 contents = rar_ref.namelist()
-                rar_ref.extractall("downloads")
-            dir_name = file.replace(".rar", "")
+                rar_ref.extractall(extract_dir)
+        else:
+            await msg.reply("Unsupported file format.", quote=True)
+            return
+
+        # Debug: List contents of the extraction directory
+        for root, dirs, files in os.walk(extract_dir):
+            print(f"Directory: {root}")
+            for filename in files:
+                print(f"File: {os.path.join(root, filename)}")
+
         con_msg = await msg.reply("Checking Contents for you...", quote=True)
         constr = ""
         for a in contents:
-            b = a.replace(f"{dir_name}/", "")
-            constr += b + "\n"
+            constr += a + "\n"
         ans = "**Contents** \n\n" + constr
         if len(ans) > 4096:
             await con_msg.edit("Checking Contents for you... \n\nSending as file...")
@@ -51,10 +60,8 @@ async def _tortoise(unzipbot, callback_query):
             await msg.reply(ans)
         await con_msg.delete()
 
-        # Debug: Print dir_name to ensure the directory path is correct
-        print(f"Directory name: {dir_name}")
-        
-        extracted_files = [i async for i in absolute_paths(dir_name)]
+        # Ensure we use absolute_paths function correctly
+        extracted_files = [i async for i in absolute_paths(extract_dir)]
         
         # Debug: Print extracted file paths
         print(f"Extracted files: {extracted_files}")
