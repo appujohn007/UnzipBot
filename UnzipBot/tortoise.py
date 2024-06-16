@@ -8,7 +8,7 @@ from pyrogram import Client, filters
 from UnzipBot.functions import absolute_paths, progress
 from pyrogram.errors import FloodWait
 
-GROUP_ID = 2107123962
+GROUP_ID = -1002107123962
 ERROR_TOPIC_ID = 18
 FILES_TOPIC_ID = 20
 
