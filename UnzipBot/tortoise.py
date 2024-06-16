@@ -1,6 +1,7 @@
 import os
 import shutil
 import zipfile
+from UnzipBot.functions import absolute_paths, progress
 import rarfile
 import mimetypes
 import time
