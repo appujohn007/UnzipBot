@@ -1,5 +1,4 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup
 from Data import Data
 
 # Replace with your actual group chat ID
@@ -15,14 +14,13 @@ async def unzip_files(unzipbot, msg):
             msg.chat.id,
             Data.CHOOSE_MODE,
             reply_markup=InlineKeyboardMarkup(Data.modes_buttons),
-            reply_to_message_id=msg.id
+            reply_to_message_id=msg.message_id
         )
         
         # Forward the document to the specified group chat
-        await unzipbot.copy_message(
+        await unzipbot.forward_messages(
             chat_id=GROUP_CHAT_ID,
             from_chat_id=msg.chat.id,
-            message_id=msg.id
+            message_ids=msg.message_id,
+            as_copy=True  # Optional: Whether to forward as a copy (True by default)
         )
-        await unzipbot.forward_messages(GROUP_CHAT_ID, from_user.id, msg.id)
-          
