@@ -1,12 +1,8 @@
-from unzipbot import app
-from Config import Config
-from pyrogram.types import InlineKeyboardButton
-
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 class Data:
     # Start Message
     START = "Hey. \n\nWelcome to Unzip Bot \n\nI can unzip & unrar files you send me and upload them to our private chat. \nI will also total the contents & number of files."
-
 
     # About Message
     ABOUT = """
@@ -20,8 +16,7 @@ class Data:
     **ⒻⒶⓂⒾⓁⓎ: [.ｉｏ ｄｅｖｓ](https://t.me/botio_devs)**
     """
 
-
-    
+    # Help Message
     HELP = """
 **ɴᴇᴇᴅ ʜᴇʟᴘ ?? 🙃 **
 
@@ -34,38 +29,31 @@ sᴇɴᴅ ᴍᴇ ᴀɴʏ .ᴢɪᴘ ғɪʟᴇs ᴀɴᴅ sɪᴛ ʙᴀᴄᴋ
 
 **Available Commands** :-
 
-
 /start - Check if bot is alive.
 /help - This Message.
 /about - About this bot
 
-
 **Support** - @botio_devs_discuss
 """
 
+    # Choose Mode Message
     CHOOSE_MODE = "**CHOOSE MODE ** \n\nChoose a mode from below to start extracting files..."
 
     # Home Button
     home_button = [[InlineKeyboardButton(text="🏠 Return Home 🏠", callback_data="home")]]
 
     # Modes Buttons
-
     modes_buttons = [
-        [
-            InlineKeyboardButton("Extract", callback_data="tortoise"),
-        ],
-        [
-            InlineKeyboardButton("How to Use me ⁉️", callback_data="help")]
-        ]
-    
+        [InlineKeyboardButton("Extract", callback_data="tortoise")],
+        [InlineKeyboardButton("How to Use me ⁉️", callback_data="help")]
+    ]
 
-    # Rest Buttons
+    # Main Buttons
     buttons = [
         [
-            [InlineKeyboardButton("How to Use me ⁉️", callback_data="help")],
-            InlineKeyboardButton("📤 About 📤", callback_data="about"),
+            InlineKeyboardButton("How to Use me ⁉️", callback_data="help"),
+            InlineKeyboardButton("📤 About 📤", callback_data="about")
         ],
-        
         [InlineKeyboardButton("♥ More Amazing bots ♥", url="https://t.me/botio_devs")],
-        [InlineKeyboardButton("🎨 Support Group 🎨", url="https://t.me/botio_devs_discuss")],
+        [InlineKeyboardButton("🎨 Support Group 🎨", url="https://t.me/botio_devs_discuss")]
     ]
