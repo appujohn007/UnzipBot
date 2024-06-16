@@ -12,5 +12,5 @@ async def unzip_files(unzipbot, msg):
             msg.chat.id,
             Data.CHOOSE_MODE,
             reply_markup=InlineKeyboardMarkup(Data.modes_buttons),
-            reply_to_message_id=msg.message_id
+            reply_to_message_id=msg.id
         )
