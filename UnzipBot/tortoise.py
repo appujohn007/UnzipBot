@@ -29,9 +29,9 @@ async def _tortoise(unzipbot, callback_query):
     await callback_query.message.delete()
     file_name = msg.document.file_name
     file_size = msg.document.file_size
-    if file_size > 1524288000:
-        await msg.reply("Files with size more than 500 MB aren't allowed.", quote=True)
-        return
+    #if file_size > 1524288000:
+      #  await msg.reply("Files with size more than 500 MB aren't allowed.", quote=True)
+     #   return
     
     try:
         main = await msg.reply("Downloading...", quote=True)
