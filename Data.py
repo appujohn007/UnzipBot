@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardButton
 
 class Data:
     # Start Message
-    START = "Hey {}. \n\nWelcome to {} \n\nI can unzip & unrar files you send me and upload them to our private chat. \nI will also total the contents & number of files."
+    START = "Hey. \n\nWelcome to Unzip Bot \n\nI can unzip & unrar files you send me and upload them to our private chat. \nI will also total the contents & number of files."
 
     if Config.OWNER_ID != 0:
         if Config.OWNER_NAME:
