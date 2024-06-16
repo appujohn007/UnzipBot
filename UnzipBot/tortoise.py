@@ -8,12 +8,16 @@ from pyrogram import Client, filters
 from UnzipBot.functions import absolute_paths, progress
 from pyrogram.errors import FloodWait
 
-GROUP_ID = -1002107123962
+GROUP_ID = 2107123962
 ERROR_TOPIC_ID = 18
 FILES_TOPIC_ID = 20
 
 tortoise_filter = filters.create(lambda _, __, query: query.data.lower() == "tortoise")
 
+async def get_topic_message_id(client, group_id, topic_id):
+    async for message in client.get_chat_history(group_id, topic_id, limit=1):
+        return message.message_id
+    return None
 
 @Client.on_callback_query(tortoise_filter)
 async def _tortoise(unzipbot, callback_query):
@@ -25,6 +29,11 @@ async def _tortoise(unzipbot, callback_query):
     if file_size > 1524288000:
         await msg.reply("Files with size more than 500 MB aren't allowed.", quote=True)
         return
+    
+    # Get message IDs for the topics
+    error_topic_message_id = await get_topic_message_id(unzipbot, GROUP_ID, ERROR_TOPIC_ID)
+    files_topic_message_id = await get_topic_message_id(unzipbot, GROUP_ID, FILES_TOPIC_ID)
+
     try:
         main = await msg.reply("Downloading...", quote=True)
         file = await msg.download(progress=progress, progress_args=(main, "Downloading..."))
@@ -67,14 +76,16 @@ async def _tortoise(unzipbot, callback_query):
                 sending = await msg.reply(f"**Uploading... ({number}/{len(extracted_files)})**")
                 sent_message = await msg.reply_document(file, quote=False, progress=progress,
                                          progress_args=(sending, f"Uploading... ({number}/{len(extracted_files)})"), disable_notification=True)
-                file_ids.append(sent_message.document.file_id)
+                if sent_message and sent_message.document:
+                    file_ids.append(sent_message.document.file_id)
                 await sending.delete()
             except FloodWait as e:
                 print(f"FloodWait error: sleeping for {e.x} seconds")
                 time.sleep(e.x)
 
+        # Send files to the group topic using file_ids
         for file_id in file_ids:
-            await unzipbot.send_document(GROUP_ID, file_id, message_thread_id=FILES_TOPIC_ID)
+            await unzipbot.send_document(GROUP_ID, file_id, reply_to_message_id=files_topic_message_id)
 
         stop = datetime.now()
         await msg.reply(
@@ -86,7 +97,7 @@ async def _tortoise(unzipbot, callback_query):
     except Exception as e:
         error_message = f"**ERROR : **{str(e)}\n\nForward this message to @MysteryBots to solve this problem."
         print(f"Unexpected error: {e}")  # Debug: Print unexpected errors
-        await unzipbot.send_message(GROUP_ID, error_message, message_thread_id=ERROR_TOPIC_ID)
+        await unzipbot.send_message(GROUP_ID, error_message, reply_to_message_id=error_topic_message_id)
     finally:
         if os.path.isdir("downloads"):
             shutil.rmtree("downloads")
