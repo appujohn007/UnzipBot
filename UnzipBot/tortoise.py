@@ -87,7 +87,7 @@ async def _tortoise(unzipbot, callback_query):
                     )
                     
                     # Forward the sent message to the group topic
-                    await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.message_id)
+                    await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.id)
                     
                     # Remove temporary thumbnail file
                     os.remove(thumbnail_path)
@@ -97,7 +97,7 @@ async def _tortoise(unzipbot, callback_query):
                     sent_message = await unzipbot.send_document(callback_query.from_user.id, file_path)
                 
                 # Forward the sent message to the group topic
-                await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.message_id)
+                await unzipbot.forward_messages(GROUP_TOPIC_CHAT_ID, callback_query.from_user.id, sent_message.id)
             except FloodWait as e:
                 print(f"FloodWait error: sleeping for {e.x} seconds")
                 time.sleep(e.x)
