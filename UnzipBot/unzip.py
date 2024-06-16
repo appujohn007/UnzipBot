@@ -4,7 +4,7 @@ from Data import Data
 
 
 # On Files
-@Client.on_message(filters.document & filters.private & ~filters.edited & filters.incoming)
+@Client.on_message(filters.document & filters.private & filters.incoming)
 async def unzip_files(unzipbot, msg):
     file_name = msg.document.file_name
     if file_name.endswith(('.zip', '.rar')):
