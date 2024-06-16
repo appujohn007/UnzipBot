@@ -42,6 +42,21 @@ sᴇɴᴅ ᴍᴇ ᴀɴʏ .ᴢɪᴘ ғɪʟᴇs ᴀɴᴅ sɪᴛ ʙᴀᴄᴋ
 
 **Support** - @botio_devs_discuss
 """
+
+        CHOOSE_MODE = "**CHOOSE MODE ** \n\nChoose a mode from below to start extracting files..."
+
+    # Home Button
+    home_button = [[InlineKeyboardButton(text="🏠 Return Home 🏠", callback_data="home")]]
+
+    # Modes Buttons
+
+    modes_buttons = [
+        [
+            InlineKeyboardButton("Extract", callback_data="tortoise"),
+        ],
+        [
+            InlineKeyboardButton("How to Use me ⁉️", callback_data="help")]
+        ]
     
 
     # Rest Buttons
