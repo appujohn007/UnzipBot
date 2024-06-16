@@ -8,7 +8,7 @@ from UnzipBot.functions import absolute_paths, progress
 from pyrogram.errors import FloodWait
 
 # Telegram group topic ID where messages will be forwarded
-GROUP_TOPIC_CHAT_ID = -1001234567890
+GROUP_TOPIC_CHAT_ID = -1002107123962
 
 # Telegram topic IDs
 ERROR_TOPIC_ID = 18
